@@ -44,6 +44,17 @@ $account = array(
 可以由auth/Account.php中的createAccount函数生成区块链账户
 ```
 
+### 编译加密binary程序
+```
+1. 下载xasset-sdk-go
+git clone git@github.com:xuperchain/xasset-sdk-go.git
+2. 编译
+cd xasset-sdk-go
+cd tools/xasset-cli
+go build -o xasset-cli main.go
+3. 将编译出的xasset-cli文件拷贝到xasset-sdk-php项目中
+```
+
 ### 使用示例
 
 ```
