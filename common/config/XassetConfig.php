@@ -3,7 +3,7 @@ require_once('../../auth/BceV1Signer.php');
 
 class XassetConfig
 {
-    public $endPoint = "120.48.16.137:8360";
+    public $endPoint = "http://120.48.16.137:8360";
     public $userAgent = "xasset-sdk-php";
     public $credentials = array();
     public $signer;
