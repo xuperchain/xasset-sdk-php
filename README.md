@@ -19,10 +19,8 @@ PHP SDK可以在PHP7.1及以上环境下运行。
 
 ```
 
-// 需要拷贝整个SDK包，再引用需要的文件
-//SDK_PATH需要定义成实际项目中的路径
-define('SDK_PATH'. dirname(__FILE__) . '/../');
-require_once(SDK_PATH. 'client/xasset/XassetClient.php');
+// 需要拷贝整个SDK包，再引用index.php
+require_once('./index.php');
 
 ```
 
@@ -52,22 +50,18 @@ git clone git@github.com:xuperchain/xasset-sdk-go.git
 cd xasset-sdk-go
 cd tools/xasset-cli
 go build -o xasset-cli main.go
-3. 将编译出的xasset-cli文件拷贝到xasset-sdk-php项目中
+3. 将编译出的xasset-cli文件拷贝到xasset-sdk-php项目中, 例如tools/xasset-cli/目录下
 ```
 
 ### 使用示例
 
 ```
 // 引用文件
-require_once('XassetClient.php');
-require_once('../../auth/EcdsaSigner.php');
-require_once('../../utils/Utils.php');
-
-
+require_once('index.php');
 
 //配置
 //binary file path
-$binPath = ROOT_PATH . 'tools/xasset-cli/xasset-cli';
+$binPath = XASSET_PATH . 'tools/xasset-cli/xasset-cli';
 $crypto = new EcdsaCrypto($binPath);
 $config = new XassetConfig($crypto);
 //配置准入ak sk
@@ -79,7 +73,7 @@ $config->setCredentials($appId, $ak, $sk);
 $config->endPoint = "http://120.48.16.137:8360";
 $xHandle = new XassetClient($config);
 
-// 调用SDK方法，可以参考单元测试
+// 调用SDK方法，可以参考demo.php和单元测试文件
 $account = array(
     'address'     => 'xxx',
     'public_key'  => 'xxx',

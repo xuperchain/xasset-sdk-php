@@ -1,7 +1,6 @@
 <?php
-define('ROOT_PATH', dirname(__FILE__) . '/../');
-require_once(ROOT_PATH . 'auth/Crypto.php');
-require_once(ROOT_PATH . 'auth/Account.php');
+require_once(XASSET_PATH . 'auth/Crypto.php');
+require_once(XASSET_PATH . 'auth/Account.php');
 
 $path = '../tools/xasset-cli/xasset-cli_mac';
 $aHandle = new Account($path);
