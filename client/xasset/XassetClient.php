@@ -1,8 +1,7 @@
 <?php
-define('ROOT_PATH', dirname(__FILE__) . '/../../');
-require_once(ROOT_PATH . 'client/BaseClient.php');
-require_once(ROOT_PATH . "auth/BceV1Signer.php");
-require_once(ROOT_PATH . "utils/Utils.php");
+require_once(XASSET_PATH . 'client/BaseClient.php');
+require_once(XASSET_PATH . "auth/BceV1Signer.php");
+require_once(XASSET_PATH . "utils/Utils.php");
 
 
 class XassetClient extends BaseClient
