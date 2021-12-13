@@ -1,10 +1,9 @@
 <?php
-define('ROOT_PATH', dirname(__FILE__) . '/../');
-require_once(ROOT_PATH . 'auth/SignerInterface.php');
-require_once(ROOT_PATH . 'auth/SignOptions.php');
-require_once(ROOT_PATH . 'common/config/HttpHeaders.php');
-require_once(ROOT_PATH . 'auth/HttpUtils.php');
-require_once(ROOT_PATH . 'auth/DateUtils.php');
+require_once(XASSET_PATH . 'auth/SignerInterface.php');
+require_once(XASSET_PATH . 'auth/SignOptions.php');
+require_once(XASSET_PATH . 'common/config/HttpHeaders.php');
+require_once(XASSET_PATH . 'auth/HttpUtils.php');
+require_once(XASSET_PATH . 'auth/DateUtils.php');
 
 /**
  * The V1 implementation of Signer with the BCE signing protocol.
