@@ -5,7 +5,7 @@ require_once('../../utils/Utils.php');
 require_once('../../common/config/XassetConfig.php');
 
 //binary file path
-$binPath = ROOT_PATH . 'tools/xasset-cli/xasset-cli';
+$binPath = XASSET_PHPSDK_PATH . 'tools/xasset-cli/xasset-cli';
 $crypto = new EcdsaCrypto($binPath);
 $config = new XassetConfig($crypto);
 
