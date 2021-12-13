@@ -1,6 +1,6 @@
 <?php
-define('ROOT_PATH', dirname(__FILE__) . '/../');
-require_once(ROOT_PATH . 'common/config/HttpHeaders.php');
+defined('XASSET_PHPSDK_PATH') or define('XASSET_PHPSDK_PATH', dirname(__DIR__) . '/');
+require_once(XASSET_PHPSDK_PATH . 'common/config/HttpHeaders.php');
 
 class HttpUtils
 {

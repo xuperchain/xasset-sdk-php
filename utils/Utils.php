@@ -1,4 +1,20 @@
 <?php
+/**
+ * 公共函数方法
+ */
+
+/*
+ * 目前仅支持pem格式的私钥签名
+ * @param string $pemPrivtKey
+ * @param string $oriMsg
+ * @return string
+ */
+function sign_ecdsa($pemPrivtKey, $oriMsg) {
+    $key = openssl_pkey_get_private($pemPrivtKey);
+    openssl_sign($oriMsg, $sign, $key, OPENSSL_ALGO_SHA256);
+    openssl_free_key($key);
+    return bin2hex($sign);
+}
 
 //生成asset_id
 function gen_asset_id($appId) {

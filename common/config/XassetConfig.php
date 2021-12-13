@@ -1,5 +1,5 @@
 <?php
-require_once('../../auth/BceV1Signer.php');
+require_once(XASSET_PHPSDK_PATH . 'auth/BceV1Signer.php');
 
 class XassetConfig
 {

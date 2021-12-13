@@ -1,6 +1,6 @@
 <?php
-define('ROOT_PATH', dirname(__FILE__) . '/../');
-require_once(ROOT_PATH . 'auth/HttpUtils.php');
+defined('XASSET_PHPSDK_PATH') or define('XASSET_PHPSDK_PATH', dirname(__DIR__) . '/');
+require_once(XASSET_PHPSDK_PATH . 'auth/HttpUtils.php');
 
 abstract class BaseClient {
     // 请求默认超时设置

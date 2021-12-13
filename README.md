@@ -58,32 +58,21 @@ go build -o xasset-cli main.go
 ### 使用示例
 
 ```
+// 详细可参考 demo.php
+
+概要流程如下：
 // 引用文件
-require_once('XassetClient.php');
-require_once('../../auth/EcdsaSigner.php');
-require_once('../../utils/Utils.php');
-
-
 
 //配置
 //binary file path
-$binPath = ROOT_PATH . 'tools/xasset-cli/xasset-cli';
-$crypto = new EcdsaCrypto($binPath);
-$config = new XassetConfig($crypto);
+
 //配置准入ak sk
 $appId = 0;
 $ak = 'xxx';
 $sk = 'xxx';
-$config->setCredentials($appId, $ak, $sk);
 
-$config->endPoint = "http://120.48.16.137:8360";
-$xHandle = new XassetClient($config);
+//调用SDK方法，可参考相关单元测试
 
-// 调用SDK方法，可以参考单元测试
-$account = array(
-    'address'     => 'xxx',
-    'public_key'  => 'xxx',
-    'private_key' => 'xxx',
-);
-$stoken = $xHandle->getStoken($account);
+//如与项目相关结构冲突，请自行参考相关测试脚本重新封装，勿过渡依赖此SDK
+
 ```
