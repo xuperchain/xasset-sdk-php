@@ -50,7 +50,8 @@ $strAssetInfo = json_encode($arrAssetInfo);
 
 $assetId = gen_asset_id($appId);
 $userId = 1231314;
-$res = $xHandle->createAsset($account, $assetId, 10000, $strAssetInfo, $userId);
+$price = 100;
+$res = $xHandle->createAsset($account, $assetId, 10000, $strAssetInfo, $price, $userId);
 var_dump($res);
 
 $arrAssetInfo = array(
@@ -60,7 +61,7 @@ $arrAssetInfo = array(
     'short_desc' => '&收藏 品1号更新过的短描述===',
 );
 $strAssetInfo = json_encode($arrAssetInfo);
-$res = $xHandle->alterAsset($account, $assetId,  10000, $strAssetInfo);
+$res = $xHandle->alterAsset($account, $assetId,  10000, $price, $strAssetInfo);
 var_dump($res);
 
 $res = $xHandle->publishAsset($account, $assetId);
@@ -68,13 +69,13 @@ var_dump($res);
 
 $shardId = gen_asset_id($appId);
 $userId = 123;
-$res = $xHandle->grantShard($account, $assetId, $shardId, $addr2, $userId);
+$res = $xHandle->grantShard($account, $assetId, $shardId, $addr2, $price, $userId);
 var_dump($res);
 
 //上链需要一点时间
 sleep(5);
 
-$res = $xHandle->transferShard($account2, $assetId, $shardId, $addr3, 456);
+$res = $xHandle->transferShard($account2, $assetId, $shardId, $addr3, $price,456);
 var_dump($res);
 
 //上链需要一点时间
