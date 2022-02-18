@@ -61,7 +61,7 @@ $arrAssetInfo = array(
     'short_desc' => '&收藏 品1号更新过的短描述===',
 );
 $strAssetInfo = json_encode($arrAssetInfo);
-$res = $xHandle->alterAsset($account, $assetId,  10000, $price, $strAssetInfo);
+$res = $xHandle->alterAsset($account, $assetId,  10000, $strAssetInfo, $price);
 var_dump($res);
 
 $res = $xHandle->publishAsset($account, $assetId);
