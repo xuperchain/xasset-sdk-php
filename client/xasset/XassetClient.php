@@ -138,7 +138,6 @@ class XassetClient extends BaseClient
             $body['asset_info'] = $assetInfo;
         }
         if ($price > -1) {
-            var_dump($price);
             $body['price'] = $price;
         }
 
