@@ -75,7 +75,7 @@ var_dump($res);
 //上链需要一点时间
 sleep(5);
 
-$res = $xHandle->transferShard($account2, $assetId, $shardId, $addr3, $price,456);
+$res = $xHandle->transferShard($account2, $assetId, $shardId, $addr3, $price, 456);
 var_dump($res);
 
 //上链需要一点时间
