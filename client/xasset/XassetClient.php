@@ -67,7 +67,7 @@ class XassetClient extends BaseClient
      * @param string $assetInfo
      * @return array|bool
      */
-    public function createAsset($account, $assetId, $amount,$assetInfo,  $price = -1, $userId = 0) {
+    public function createAsset($account, $assetId, $amount, $assetInfo, $price = -1, $userId = 0) {
         $this->cleanError();
 
         if ($assetId < 1 || $amount < 1 || $assetInfo == '') {
