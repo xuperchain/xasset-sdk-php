@@ -67,7 +67,7 @@ class XassetClient extends BaseClient
      * @param string $assetInfo
      * @return array|bool
      */
-    public function createAsset($account, $assetId, $amount, $assetInfo, $userId = 0) {
+    public function createAsset($account, $assetId, $amount, $assetInfo, $price = -1, $userId = 0) {
         $this->cleanError();
 
         if ($assetId < 1 || $amount < 1 || $assetInfo == '') {
@@ -92,6 +92,9 @@ class XassetClient extends BaseClient
             'pkey'       => $account['private_key'],
             'nonce'      => $nonce,
         );
+        if ($price > -1) {
+            $body['price'] = $price;
+        }
         if ($userId > 0) {
             $body['user_id'] = $userId;
         }
@@ -106,7 +109,7 @@ class XassetClient extends BaseClient
      * @param string $assetInfo
      * @return array|bool
      */
-    public function alterAsset($account, $assetId, $amount, $assetInfo) {
+    public function alterAsset($account, $assetId, $amount, $assetInfo, $price = -1) {
         $this->cleanError();
 
         if ($assetId < 1 || $assetInfo == '') {
@@ -133,6 +136,10 @@ class XassetClient extends BaseClient
         }
         if ($assetInfo != '') {
             $body['asset_info'] = $assetInfo;
+        }
+        if ($price > -1) {
+            var_dump($price);
+            $body['price'] = $price;
         }
 
         return $this->doRequestRetry(self::XassetApiHoraeAlter, array(), $body);
@@ -231,7 +238,7 @@ class XassetClient extends BaseClient
      * @param int $toUserId
      * @return array|bool
      */
-    public function grantShard($account, $assetId, $shardId, $toAddr, $toUserId = 0) {
+    public function grantShard($account, $assetId, $shardId, $toAddr, $price = -1 ,$toUserId = 0) {
         $this->cleanError();
 
         if ($assetId < 1 || $shardId < 1 || $toAddr == "") {
@@ -257,6 +264,9 @@ class XassetClient extends BaseClient
             'to_addr'   => $toAddr,
             'to_userid' => $toUserId,
         );
+        if ($price > -1 ) {
+            $body['price'] = $price;
+        }
         if ($toUserId > 0) {
             $body['to_userid'] = $toUserId;
         }
@@ -272,7 +282,7 @@ class XassetClient extends BaseClient
      * @param int $toUserId
      * @return array|bool
      */
-    public function transferShard($account, $assetId, $shardId, $toAddr, $toUserId = 0) {
+    public function transferShard($account, $assetId, $shardId, $toAddr, $price = -1, $toUserId = 0) {
         $this->cleanError();
 
         if ($assetId < 1 || $shardId < 1 || $toAddr == "") {
@@ -296,6 +306,9 @@ class XassetClient extends BaseClient
             'nonce'    => $nonce,
             'to_addr'  => $toAddr,
         );
+        if ($price > -1) {
+            $body['price'] = $price;
+        }
         if ($toUserId > 0) {
             $body['to_userid'] = $toUserId;
         }
