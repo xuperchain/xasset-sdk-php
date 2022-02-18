@@ -1,5 +1,5 @@
 <?php
-require_once(XASSET_PATH. 'index.php');
+require_once('../../index.php');
 
 //binary file path
 $binPath = XASSET_PATH . 'tools/xasset-cli/xasset-cli';
@@ -50,8 +50,10 @@ $strAssetInfo = json_encode($arrAssetInfo);
 
 $assetId = gen_asset_id($appId);
 $userId = 1231314;
-$res = $xHandle->createAsset($account, $assetId, 10000, $strAssetInfo, $userId);
+$price = 100;
+$res = $xHandle->createAsset($account, $assetId, 10000, $strAssetInfo, $price, $userId);
 var_dump($res);
+
 
 $arrAssetInfo = array(
     'title' => '收藏品1号',
@@ -60,7 +62,7 @@ $arrAssetInfo = array(
     'short_desc' => '&收藏 品1号更新过的短描述===',
 );
 $strAssetInfo = json_encode($arrAssetInfo);
-$res = $xHandle->alterAsset($account, $assetId,  10000, $strAssetInfo);
+$res = $xHandle->alterAsset($account, $assetId,  10000, $strAssetInfo, $price);
 var_dump($res);
 
 $res = $xHandle->publishAsset($account, $assetId);
@@ -68,13 +70,13 @@ var_dump($res);
 
 $shardId = gen_asset_id($appId);
 $userId = 123;
-$res = $xHandle->grantShard($account, $assetId, $shardId, $addr2, $userId);
+$res = $xHandle->grantShard($account, $assetId, $shardId, $addr2, $price, $userId);
 var_dump($res);
 
 //上链需要一点时间
 sleep(5);
 
-$res = $xHandle->transferShard($account2, $assetId, $shardId, $addr3, 456);
+$res = $xHandle->transferShard($account2, $assetId, $shardId, $addr3, $price, 456);
 var_dump($res);
 
 //上链需要一点时间
@@ -90,9 +92,6 @@ $res = $xHandle->queryShard($assetId, $shardId);
 var_dump($res);
 
 $res = $xHandle->listShardsByAddr($addr2, 1, 10);
-var_dump($res);
-
-$res = $xHandle->listShardsByAsset($assetId, "", 10);
 var_dump($res);
 
 $res = $xHandle->listShardsByAsset($assetId, "", 10);
