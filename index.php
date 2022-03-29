@@ -12,3 +12,5 @@ require_once(XASSET_PATH . 'auth/SignOptions.php');
 require_once(XASSET_PATH . 'utils/Utils.php');
 require_once(XASSET_PATH . 'common/config/XassetConfig.php');
 require_once(XASSET_PATH . 'common/config/HttpHeaders.php');
+//需提前加载文件上传需要的bos sdk 否则可能会引入错误 sdk 下载地址 https://sdk.bce.baidu.com/console-sdk/bce-php-sdk-0.9.16.zip
+require_once(XASSET_PATH . 'bce-php-sdk/BaiduBce.phar');
