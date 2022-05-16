@@ -46,9 +46,9 @@ $account = array(
 ```
 方式一：
 直接从百度云BOS下载bin文件：
-Linux: https://xasset-open.cdn.bcebos.com/resources/xasset-cli/xasset-cli.linux
-Windows: https://xasset-open.cdn.bcebos.com/resources/xasset-cli/xasset-cli.exe
-Mac: https://xasset-open.cdn.bcebos.com/resources/xasset-cli/xasset-cli.darwin
+Linux: https://xasset-open.cdn.bcebos.com/resources/xasset-cli/linux/xasset-cli
+Windows: https://xasset-open.cdn.bcebos.com/resources/xasset-cli/windows/xasset-cli.exe
+Mac: https://xasset-open.cdn.bcebos.com/resources/xasset-cli/mac/xasset-cli
 
 方式二：
 通过go sdk源码编译生成bin文件
@@ -70,7 +70,10 @@ require_once('index.php');
 
 //配置
 //binary file path
+//linux mac
 $binPath = XASSET_PATH . 'tools/xasset-cli/xasset-cli';
+//windows
+//$binPath = XASSET_PATH . 'tools/xasset-cli/xasset-cli.exe';
 $crypto = new EcdsaCrypto($binPath);
 $config = new XassetConfig($crypto);
 //配置准入ak sk
