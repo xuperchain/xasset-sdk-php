@@ -2,7 +2,10 @@
 require_once('../../index.php');
 
 //binary file path
+//linux mac
 $binPath = XASSET_PATH . 'tools/xasset-cli/xasset-cli';
+//windows
+//$binPath = XASSET_PATH . 'tools/xasset-cli/xasset-cli.exe';
 $crypto = new EcdsaCrypto($binPath);
 $config = new XassetConfig($crypto);
 
