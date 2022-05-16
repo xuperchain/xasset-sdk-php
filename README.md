@@ -42,15 +42,24 @@ $account = array(
 可以由auth/Account.php中的createAccount函数生成区块链账户
 ```
 
-### 编译加密binary程序
+### 获取加密binary程序
 ```
+方式一：
+直接从百度云BOS下载bin文件：
+Linux: https://xasset-open.cdn.bcebos.com/resources/xasset-cli/xasset-cli.linux
+Windows: https://xasset-open.cdn.bcebos.com/resources/xasset-cli/xasset-cli.exe
+Mac: https://xasset-open.cdn.bcebos.com/resources/xasset-cli/xasset-cli.darwin
+
+方式二：
+通过go sdk源码编译生成bin文件
 1. 下载xasset-sdk-go
 git clone git@github.com:xuperchain/xasset-sdk-go.git
 2. 编译
 cd xasset-sdk-go
 cd tools/xasset-cli
 go build -o xasset-cli main.go
-3. 将编译出的xasset-cli文件拷贝到xasset-sdk-php项目中, 例如tools/xasset-cli/目录下
+
+通过方式一或方式二获取xchain-cli文件, 把xasset-cli文件拷贝到xasset-sdk-php项目中, 例如tools/xasset-cli/目录下
 ```
 
 ### 使用示例
