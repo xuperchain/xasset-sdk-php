@@ -3,6 +3,11 @@ require_once(XASSET_PATH . 'client/BaseClient.php');
 require_once(XASSET_PATH . "auth/BceV1Signer.php");
 require_once(XASSET_PATH . "utils/Utils.php");
 
+//需提前加载文件上传需要的bos sdk 否则可能会引入错误 sdk 下载地址 https://sdk.bce.baidu.com/console-sdk/bce-php-sdk-0.9.16.zip
+// 下载解压完成后，引入
+require_once(XASSET_PATH . 'bce-php-sdk/BaiduBce.phar');
+
+
 
 class XassetClient extends BaseClient
 {
@@ -58,6 +63,44 @@ class XassetClient extends BaseClient
         );
 
         return $this->doRequestRetry(self::XassetApiGetStoken, array(), $body);
+    }
+
+    /**
+     * @param array $account
+     * @param string $filename
+     * @param string  $property 图片属性 格式为 weight_height 不传将通过函数获取图片实际宽高
+     * @return array|bool
+     */
+    public function UploadFile($account, $filename, $property = false) {
+        $stoken = $this->getStoken($account);
+        $accessInfo = $stoken['response']['accessInfo'];
+        $bucketName = $accessInfo['bucket'];
+        $objectPath = $accessInfo['object_path'];
+        $objectKey = $objectPath.$filename;
+        $BOS_TEST_CONFIG = [
+            'credentials'=>[
+                'accessKeyId'=>$accessInfo['access_key_id'],
+                'secretAccessKey'=>$accessInfo['secret_access_key'],
+                'sessionToken'=>$accessInfo['session_token'],
+            ],
+            'endpoint'=>$accessInfo['endPoint']
+        ];
+        $BosClient =  new BaiduBce\Services\Bos\BosClient($BOS_TEST_CONFIG);
+        $re = $BosClient->putObjectFromFile($bucketName,$objectKey,$filename);
+        if(!$property){
+            $FileInfo = getimagesize($filename);
+            $property = $FileInfo[0]."_".$FileInfo[1];
+        }
+        $link = "bos_v1://". $bucketName."/".$objectKey."/".$property;
+        //通过判断是否返回etag 判定是否上传成功
+        if($re->metadata['etag']){
+            return [
+                'Link'=>$link,
+                'AccessInfo'=>$accessInfo
+            ];
+        }else{
+            return "upload file err";
+        }
     }
 
     /**
