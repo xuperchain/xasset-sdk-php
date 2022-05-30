@@ -484,7 +484,7 @@ class XassetClient extends BaseClient
      * @param $account
      * @param $assetId
      */
-    public function FreezeAsset($account, $assetId){
+    public function FreezeAsset($account, $assetId) {
         $this->cleanError();
 
         if ($assetId < 1) {
@@ -513,13 +513,13 @@ class XassetClient extends BaseClient
 
     /**
      * @content 销毁碎片
-     * @param $caccount  创建资产的账户
-     * @param $uaccount  拥有碎片的账户
+     * @param $caccount 创建资产的账户
+     * @param $uaccount 拥有碎片的账户
      * @param $assetId
      * @param $shardId
      * @return bool
      */
-    public function ConsumeShard($caccount, $uaccount, $assetId, $shardId){
+    public function ConsumeShard($caccount, $uaccount, $assetId, $shardId) {
         $this->cleanError();
 
         if ($assetId < 1 || $shardId < 1) {
