@@ -225,37 +225,6 @@ class XassetClient extends BaseClient
         return $this->doRequestRetry(self::XassetApiHoraePublish, array(), $body);
     }
 
-    /**
-     * @content 资产锁仓
-     * @param $account
-     * @param $assetId
-     */
-    public function FreezeAsset($account, $assetId){
-        $this->cleanError();
-
-        if ($assetId < 1) {
-            $this->setError(parent::ClientErrnoParamErr, 'param error');
-            return false;
-        }
-        if (!self::isValidAccount($account)) {
-            $this->setError(parent::ClientErrnoParamErr, 'param error');
-            return false;
-        }
-
-        $nonce   = gen_nonce();
-        $signMsg = sprintf("%d%d", $assetId, $nonce);
-        $sign    = $this->crypto->signEcdsa($account['private_key'], $signMsg);
-
-        $body = array(
-            'asset_id' => $assetId,
-            'addr'     => $account['address'],
-            'sign'     => $sign,
-            'pkey'     => $account['public_key'],
-            'nonce'    => $nonce,
-        );
-
-        return $this->doRequestRetry(self::XassetApiHoraeFreeze, array(), $body);
-    }
 
     /**
      * @content 查询数字资产详情
@@ -367,45 +336,7 @@ class XassetClient extends BaseClient
         return $this->doRequestRetry(self::XassetApiHoraeTransfer, array(), $body);
     }
 
-    /**
-     * @content 销毁碎片
-     * @param $caccount  创建资产的账户
-     * @param $uaccount  拥有碎片的账户
-     * @param $assetId
-     * @param $shardId
-     * @return bool
-     */
-    public function ConsumeShard($caccount, $uaccount, $assetId, $shardId){
-        $this->cleanError();
 
-        if ($assetId < 1 || $shardId < 1) {
-            $this->setError(parent::ClientErrnoParamErr, 'param error');
-            return false;
-        }
-        if (!self::isValidAccount($caccount) || !self::isValidAccount($uaccount) ) {
-            $this->setError(parent::ClientErrnoParamErr, 'param error');
-            return false;
-        }
-
-        $nonce   = gen_nonce();
-        $signMsg = sprintf("%d%d", $assetId, $nonce);
-        $csign    = $this->crypto->signEcdsa($caccount['private_key'], $signMsg);
-        $usign    = $this->crypto->signEcdsa($uaccount['private_key'], $signMsg);
-
-        $body = array(
-            'asset_id' => $assetId,
-            'shard_id' => $shardId,
-            'addr'     => $caccount['address'],
-            'sign'     => $csign,
-            'pkey'     => $caccount['public_key'],
-            'nonce'    => $nonce,
-            'user_addr'  => $uaccount['address'],
-            'user_sign'  => $usign,
-            'user_pkey'  => $uaccount['public_key'],
-        );
-
-        return $this->doRequestRetry(self::XassetApiHoraeConsume, array(), $body);
-    }
 
     /**
      * @content 获取用户创建的藏品列表
@@ -546,5 +477,77 @@ class XassetClient extends BaseClient
         );
 
         return $this->doRequestRetry(self::XassetApiHoraeGetEvidenceInfo, array(), $body);
+    }
+
+    /**
+     * @content 资产锁仓
+     * @param $account
+     * @param $assetId
+     */
+    public function FreezeAsset($account, $assetId){
+        $this->cleanError();
+
+        if ($assetId < 1) {
+            $this->setError(parent::ClientErrnoParamErr, 'param error');
+            return false;
+        }
+        if (!self::isValidAccount($account)) {
+            $this->setError(parent::ClientErrnoParamErr, 'param error');
+            return false;
+        }
+
+        $nonce   = gen_nonce();
+        $signMsg = sprintf("%d%d", $assetId, $nonce);
+        $sign    = $this->crypto->signEcdsa($account['private_key'], $signMsg);
+
+        $body = array(
+            'asset_id' => $assetId,
+            'addr'     => $account['address'],
+            'sign'     => $sign,
+            'pkey'     => $account['public_key'],
+            'nonce'    => $nonce,
+        );
+
+        return $this->doRequestRetry(self::XassetApiHoraeFreeze, array(), $body);
+    }
+
+    /**
+     * @content 销毁碎片
+     * @param $caccount  创建资产的账户
+     * @param $uaccount  拥有碎片的账户
+     * @param $assetId
+     * @param $shardId
+     * @return bool
+     */
+    public function ConsumeShard($caccount, $uaccount, $assetId, $shardId){
+        $this->cleanError();
+
+        if ($assetId < 1 || $shardId < 1) {
+            $this->setError(parent::ClientErrnoParamErr, 'param error');
+            return false;
+        }
+        if (!self::isValidAccount($caccount) || !self::isValidAccount($uaccount) ) {
+            $this->setError(parent::ClientErrnoParamErr, 'param error');
+            return false;
+        }
+
+        $nonce   = gen_nonce();
+        $signMsg = sprintf("%d%d", $assetId, $nonce);
+        $csign    = $this->crypto->signEcdsa($caccount['private_key'], $signMsg);
+        $usign    = $this->crypto->signEcdsa($uaccount['private_key'], $signMsg);
+
+        $body = array(
+            'asset_id' => $assetId,
+            'shard_id' => $shardId,
+            'addr'     => $caccount['address'],
+            'sign'     => $csign,
+            'pkey'     => $caccount['public_key'],
+            'nonce'    => $nonce,
+            'user_addr'  => $uaccount['address'],
+            'user_sign'  => $usign,
+            'user_pkey'  => $uaccount['public_key'],
+        );
+
+        return $this->doRequestRetry(self::XassetApiHoraeConsume, array(), $body);
     }
 }
