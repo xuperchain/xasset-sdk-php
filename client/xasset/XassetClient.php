@@ -19,7 +19,6 @@ class XassetClient extends BaseClient
     const XassetApiHoraeAlter = '/xasset/horae/v1/alter';
     const XassetApiHoraePublish = '/xasset/horae/v1/publish';
     const XassetApiHoraeQuery = '/xasset/horae/v1/query';
-    const XassetApiHoraeListByStatus = '/xasset/horae/v1/listbystatus';
     const XassetApiHoraeGrant = '/xasset/horae/v1/grant';
     const XassetApiHoraeTransfer = '/xasset/damocles/v1/transfer';
     const XassetApiHoraeListAstByAddr = '/xasset/horae/v1/listastbyaddr';
@@ -28,6 +27,8 @@ class XassetClient extends BaseClient
     const XassetApiHoraeListSdsByAst = '/xasset/horae/v1/listsdsbyast';
     const XassetApiHoraeAstHistory = '/xasset/horae/v1/history';
     const XassetApiHoraeGetEvidenceInfo = '/xasset/horae/v1/getevidenceinfo';
+    const XassetApiHoraeFreeze = '/xasset/horae/v1/freeze';
+    const XassetApiHoraeConsume = '/xasset/horae/v1/consume';
 
     const XassetApiGetStoken = '/xasset/file/v1/getstoken';
 
@@ -41,6 +42,7 @@ class XassetClient extends BaseClient
     }
 
     /**
+     * @content 获取上传bos 临时sts授权
      * @param array $account
      * @return array|bool
      */
@@ -66,6 +68,7 @@ class XassetClient extends BaseClient
     }
 
     /**
+     * @content 使用sts临时授权 上传文件到bos
      * @param array $account
      * @param string $filename
      * @param string  $property 图片属性 格式为 weight_height 不传将通过函数获取图片实际宽高
@@ -104,6 +107,7 @@ class XassetClient extends BaseClient
     }
 
     /**
+     * @content 创建数字资产 此时不会上链
      * @param array $account
      * @param int $assetId
      * @param int $amount
@@ -146,6 +150,7 @@ class XassetClient extends BaseClient
     }
 
     /**
+     * @content 修改已经创建未发行的数字藏品信息
      * @param array $account
      * @param int $assetId
      * @param int $amount
@@ -188,6 +193,7 @@ class XassetClient extends BaseClient
     }
 
     /**
+     * @content 发行数字资产上链
      * @param array $account
      * @param int $assetId
      * @return array|bool
@@ -220,6 +226,39 @@ class XassetClient extends BaseClient
     }
 
     /**
+     * @content 资产锁仓
+     * @param $account
+     * @param $assetId
+     */
+    public function FreezeAsset($account, $assetId){
+        $this->cleanError();
+
+        if ($assetId < 1) {
+            $this->setError(parent::ClientErrnoParamErr, 'param error');
+            return false;
+        }
+        if (!self::isValidAccount($account)) {
+            $this->setError(parent::ClientErrnoParamErr, 'param error');
+            return false;
+        }
+
+        $nonce   = gen_nonce();
+        $signMsg = sprintf("%d%d", $assetId, $nonce);
+        $sign    = $this->crypto->signEcdsa($account['private_key'], $signMsg);
+
+        $body = array(
+            'asset_id' => $assetId,
+            'addr'     => $account['address'],
+            'sign'     => $sign,
+            'pkey'     => $account['public_key'],
+            'nonce'    => $nonce,
+        );
+
+        return $this->doRequestRetry(self::XassetApiHoraeFreeze, array(), $body);
+    }
+
+    /**
+     * @content 查询数字资产详情
      * @param int $assetId
      * @return array|bool
      */
@@ -238,41 +277,10 @@ class XassetClient extends BaseClient
         return $this->doRequestRetry(self::XassetApiHoraeQuery, array(), $body);
     }
 
-    /**
-     * @param array $account
-     * @param int $status
-     * @param int $page
-     * @param int $limit
-     * @return array|bool
-     */
-    public function horaeListbystatus($account, $status, $page, $limit) {
-        $this->cleanError();
 
-        if (!self::isValidAccount($account)) {
-            $this->setError(parent::ClientErrnoParamErr, 'param error');
-            return false;
-        }
-
-        $nonce   = gen_nonce();
-        $signMsg = sprintf("%d", $nonce);
-        $sign    = $this->crypto->signEcdsa($account['private_key'], $signMsg);
-
-        $body = array(
-            'status' => $status,
-            'nonce'  => $nonce,
-            'addr'   => $account['address'],
-            'sign'   => $sign,
-            'pkey'   => $account['public_key'],
-            'page'   => $page,
-        );
-        if ($limit > 0) {
-            $body['limit'] = $limit;
-        }
-
-        return $this->doRequestRetry(self::XassetApiHoraeListByStatus, array(), $body);
-    }
 
     /**
+     * @content 授予碎片
      * @param array $account
      * @param int $assetId
      * @param int $shardId
@@ -317,6 +325,7 @@ class XassetClient extends BaseClient
     }
 
     /**
+     * @content 碎片转移
      * @param array $account
      * @param int $assetId
      * @param int $shardId
@@ -359,6 +368,47 @@ class XassetClient extends BaseClient
     }
 
     /**
+     * @content 销毁碎片
+     * @param $caccount  创建资产的账户
+     * @param $uaccount  拥有碎片的账户
+     * @param $assetId
+     * @param $shardId
+     * @return bool
+     */
+    public function ConsumeShard($caccount, $uaccount, $assetId, $shardId){
+        $this->cleanError();
+
+        if ($assetId < 1 || $shardId < 1) {
+            $this->setError(parent::ClientErrnoParamErr, 'param error');
+            return false;
+        }
+        if (!self::isValidAccount($caccount) || !self::isValidAccount($uaccount) ) {
+            $this->setError(parent::ClientErrnoParamErr, 'param error');
+            return false;
+        }
+
+        $nonce   = gen_nonce();
+        $signMsg = sprintf("%d%d", $assetId, $nonce);
+        $csign    = $this->crypto->signEcdsa($caccount['private_key'], $signMsg);
+        $usign    = $this->crypto->signEcdsa($uaccount['private_key'], $signMsg);
+
+        $body = array(
+            'asset_id' => $assetId,
+            'shard_id' => $shardId,
+            'addr'     => $caccount['address'],
+            'sign'     => $csign,
+            'pkey'     => $caccount['public_key'],
+            'nonce'    => $nonce,
+            'user_addr'  => $uaccount['address'],
+            'user_sign'  => $usign,
+            'user_pkey'  => $uaccount['public_key'],
+        );
+
+        return $this->doRequestRetry(self::XassetApiHoraeConsume, array(), $body);
+    }
+
+    /**
+     * @content 获取用户创建的藏品列表
      * @param string $addr
      * @param int $status
      * @param int $page
@@ -384,6 +434,7 @@ class XassetClient extends BaseClient
     }
 
     /**
+     * @content 查询碎片详情
      * @param int $assetId
      * @param int $shardId
      * @return array|bool
@@ -405,6 +456,7 @@ class XassetClient extends BaseClient
     }
 
     /**
+     * @content 分页拉取用户拥有的碎片
      * @param string $addr
      * @param int $page
      * @param int $limit
@@ -428,6 +480,7 @@ class XassetClient extends BaseClient
     }
 
     /**
+     * @content 查询指定资产已经授予的碎片列表
      * @param int $assetId
      * @param string $cursor
      * @param int $limit
@@ -451,6 +504,7 @@ class XassetClient extends BaseClient
     }
 
     /**
+     * @content 拉取数字资产等级记录
      * @param int $assetId
      * @param int $page
      * @param int $limit
@@ -473,7 +527,9 @@ class XassetClient extends BaseClient
         return $this->doRequestRetry(self::XassetApiHoraeAstHistory, array(), $body);
     }
 
+
     /**
+     * @content 获取存证相关信息
      * @param int $assetId
      * @return array|bool
      */
