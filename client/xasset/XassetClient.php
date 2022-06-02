@@ -519,7 +519,7 @@ class XassetClient extends BaseClient
      * @param $shardId
      * @return bool
      */
-    public function ConsumeShard($caccount, $uaccount, $assetId, $shardId) {
+    public function consumeShard($caccount, $uaccount, $assetId, $shardId) {
         $this->cleanError();
 
         if ($assetId < 1 || $shardId < 1) {
