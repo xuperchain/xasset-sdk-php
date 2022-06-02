@@ -484,7 +484,7 @@ class XassetClient extends BaseClient
      * @param $account
      * @param $assetId
      */
-    public function FreezeAsset($account, $assetId) {
+    public function freezeAsset($account, $assetId) {
         $this->cleanError();
 
         if ($assetId < 1) {
