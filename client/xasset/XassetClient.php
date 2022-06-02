@@ -96,7 +96,7 @@ class XassetClient extends BaseClient
         }
         $link = "bos_v1://". $bucketName."/".$objectKey."/".$property;
         //通过判断是否返回etag 判定是否上传成功
-        if($re->metadata['etag']){
+        if(isset($re->metadata['etag']) && !empty($re->metadata['etag'])){
             return [
                 'Link'=>$link,
                 'AccessInfo'=>$accessInfo
