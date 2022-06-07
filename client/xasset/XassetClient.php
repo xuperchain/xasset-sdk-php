@@ -90,7 +90,7 @@ class XassetClient extends BaseClient
             'endpoint'=>$accessInfo['endpoint']
         ];
         $BosClient =  new BaiduBce\Services\Bos\BosClient($BOS_TEST_CONFIG);
-        if(is_file($filepath)){
+        if(file_exists($filepath)){
             $re = $BosClient->putObjectFromFile($bucketName,$objectKey,$filepath);
         } else {
             return "upload file does not exist ";
