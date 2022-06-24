@@ -136,7 +136,7 @@ class XassetClient extends BaseClient
             'asset_info' => $assetInfo,
             'addr'       => $account['address'],
             'sign'       => $sign,
-            'pkey'       => $account['private_key'],
+            'pkey'       => $account['public_key'],
             'nonce'      => $nonce,
         );
         if ($price > -1) {

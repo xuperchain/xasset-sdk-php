@@ -13,7 +13,7 @@
 
 ### 运行环境
 
-PHP SDK可以在PHP7.1及以上环境下运行。
+PHP SDK可以在PHP5.4及以上环境下运行。
 
 ### 引用SDK包
 
@@ -59,7 +59,7 @@ cd xasset-sdk-go
 cd tools/xasset-cli
 go build -o xasset-cli main.go
 
-通过方式一或方式二获取xchain-cli文件, 把xasset-cli文件拷贝到xasset-sdk-php项目中, 例如tools/xasset-cli/目录下
+通过方式一或方式二获取xchain-cli文件, 把xasset-cli文件拷贝到xasset-sdk-php项目中, 例如tools/xasset-cli/目录下。确保xaset-cli是可执行文件。
 ```
 
 ### 使用示例
