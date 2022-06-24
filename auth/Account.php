@@ -21,7 +21,7 @@ class Account {
     }
 
     public function retrieveAccount($mnemonic) {
-        $cmd = sprintf(" account retrieve -m '%s' -l 1 -f std", $mnemonic);
+        $cmd = sprintf(" account retrieve -m \"%s\" -l 1 -f std", $mnemonic);
         $s = exec($this->binPath . $cmd);
         $arrAccount = json_decode(trim($s), true);
         if (empty($arrAccount) || !is_array($arrAccount)) {
