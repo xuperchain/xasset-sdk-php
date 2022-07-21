@@ -30,6 +30,12 @@ class XassetClient extends BaseClient
     const XassetApiHoraeFreeze = '/xasset/horae/v1/freeze';
     const XassetApiHoraeConsume = '/xasset/horae/v1/consume';
 
+    const XassetApiSceneListAddr = '/xasset/scene/v1/listaddr';
+    const XassetApiSceneListSdsByAddr = '/xasset/scene/v1/listsdsbyaddr';
+    const XassetApiSceneHasAsset = '/xasset/scene/v1/hasastbyaddr';
+    const XassetApiSceneListDiffByAddr = '/xasset/scene/v1/listdiffbyaddr';
+    const XassetApiSceneQueryShard = '/xasset/scene/v1/qrysdsinfo';
+
     const XassetApiGetStoken = '/xasset/file/v1/getstoken';
 
     /**
@@ -549,5 +555,139 @@ class XassetClient extends BaseClient
         );
 
         return $this->doRequestRetry(self::XassetApiHoraeConsume, array(), $body);
+    }
+
+    /**
+     * @content
+     * @param string $unionId 第三方应用获取的union_id sk加密串
+     * @return array|bool
+     */
+    public function sceneListAddr($unionId) {
+        $this->cleanError();
+
+        if ($unionId == "") {
+            $this->setError(parent::ClientErrnoParamErr, 'param error');
+            return false;
+        }
+
+        $body = array(
+            'union_id' => $unionId
+        );
+
+        return $this->doRequestRetry(self::XassetApiSceneListAddr, array(), $body);
+    }
+
+    /**
+     * @content 拉取address下允许访问的藏品列表
+     * @param string $addr 要查询的账户地址
+     * @param string $token token
+     * @param int $limit
+     * @param string $cursor
+     * @return array|bool
+     */
+    public function sceneListShardsByAddr($addr, $token, $limit = 0, $cursor = "") {
+        $this->cleanError();
+
+        if ($addr == "" || $token == "") {
+            $this->setError(parent::ClientErrnoParamErr, 'param error');
+            return false;
+        }
+
+        $body = array(
+            'addr' => $addr,
+            'token' => $token,
+        );
+        if ($limit > 0) {
+            $body['limit'] = $limit;
+        }
+        if ($cursor != "") {
+            $body['cursor'] = $cursor;
+        }
+
+        return $this->doRequestRetry(self::XassetApiSceneListSdsByAddr, array(), $body);
+    }
+
+    /**
+     * @content 判断address下是否有指定藏品
+     * @param string $addr 账户地址
+     * @param string $token token
+     * @param array $assetIds asset_id列表一次查询不超过10个
+     * @return array|bool
+     */
+    public function sceneHasAsset($addr, $token, $assetIds) {
+        $this->cleanError();
+
+        if ($addr == "" || $token == "" || count($assetIds) < 1) {
+            $this->setError(parent::ClientErrnoParamErr, 'param error');
+            return false;
+        }
+
+        $body = array(
+            'addr' => $addr,
+            'token' => $token,
+            'asset_ids' => json_encode($assetIds),
+        );
+
+        return $this->doRequestRetry(self::XassetApiSceneHasAsset, array(), $body);
+    }
+
+    /**
+     * @content 拉取address下藏品变更记录
+     * @param string $addr
+     * @param string $token
+     * @param int $limit
+     * @param string $cursor
+     * @param array $opTypes 操作类型
+     * @return array|bool
+     */
+    public function sceneListDiffByAddr($addr, $token, $limit = 0, $cursor = "", $opTypes = array()) {
+        $this->cleanError();
+
+        if ($addr == "" || $token == "") {
+            $this->setError(parent::ClientErrnoParamErr, 'param error');
+            return false;
+        }
+
+        $body = array(
+            'addr' => $addr,
+            'token' => $token,
+        );
+        if ($limit > 0) {
+            $body['limit'] = $limit;
+        }
+        if ($cursor != "") {
+            $body['cursor'] = $cursor;
+        }
+        if (count($opTypes) > 0) {
+            $body['op_types'] = json_encode($opTypes);
+        }
+
+        return $this->doRequestRetry(self::XassetApiSceneListDiffByAddr, array(), $body);
+    }
+
+    /**
+     * @content 查询用户碎片详情
+     * @param string $addr
+     * @param string $token
+     * @param int $assetId
+     * @param int $shardId
+     * @return array|bool
+     */
+    public function sceneQueryShard($addr, $token, $assetId, $shardId) {
+        $this->cleanError();
+
+        if ($addr == "" || $token == "" || $assetId < 1 || $shardId < 1) {
+            $this->setError(parent::ClientErrnoParamErr, 'param error');
+            return false;
+        }
+
+        $body = array(
+            'addr' => $addr,
+            'token' => $token,
+            'asset_id' => $assetId,
+            'shard_id' => $shardId,
+        );
+
+        return $this->doRequestRetry(self::XassetApiSceneQueryShard, array(), $body);
     }
 }
