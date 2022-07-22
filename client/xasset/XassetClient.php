@@ -637,8 +637,8 @@ class XassetClient extends BaseClient
 
     /**
      * @content 使用手百小程序绑定链上账户 通过已有助记词进行绑定
-     * @param string $openId
-     * @param string $appKey
+     * @param string $openId 手百小程序open_id
+     * @param string $appKey 手百小程序app_key
      * @param string $mnemonic
      * @return array|bool
      */
@@ -690,7 +690,7 @@ class XassetClient extends BaseClient
 
     /**
      * @content
-     * @param string $unionId 第三方应用获取的union_id sk加密串
+     * @param string $unionId 第三方应用获取的union_id
      * @return array|bool
      */
     public function sceneListAddr($unionId) {
