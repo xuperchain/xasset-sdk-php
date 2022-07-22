@@ -19,7 +19,7 @@ abstract class BaseClient {
     private $isHttps = false;
     private $host = "";
     private $signer;
-    private $credentials;
+    protected $credentials;
     private $userAgent;
     private $connTimeout;
     private $rwTimeout;
