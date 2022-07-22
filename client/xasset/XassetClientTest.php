@@ -97,10 +97,51 @@ var_dump($res);
 $res = $xHandle->listShardsByAddr($addr2, 1, 10);
 var_dump($res);
 
+$opTypes = array();
+$res = $xHandle->listDiffByAddr($addr2, 0, "", $opTypes);
+var_dump($res);
+
 $res = $xHandle->listShardsByAsset($assetId, "", 10);
 var_dump($res);
 
 $res = $xHandle->getEvidenceInfo($assetId);
 var_dump($res);
 
+$openId = '';
+$appKey = '';
+$res = $xHandle->bdboxRegister($openId, $appKey);
+var_dump($res);
 
+$mnemonic = '';
+$res = $xHandle->bdboxBind($openId, $appKey, $mnemonic);
+var_dump($res);
+
+//$unionId获取方式参考https://openauth.baidu.com/doc/doc.html
+$unionId = 'xxx';
+$res = $xHandle->bindByUnionid($unionId, $mnemonic);
+var_dump($res);
+
+$res = $xHandle->sceneListAddr($unionId);
+var_dump($res);
+
+//使用listaddr获取获取到的数据, 选择要查询的addr和token
+//$addr = $res['response']['list'][0]['addr'];
+//$token = $res['response']['list'][0]['token'];
+$sceneAddr = '';
+$token = '';
+
+$res = $xHandle->sceneListShardsByAddr($sceneAddr, $token);
+var_dump($res);
+
+$assetIds = array(111, 222, 333);
+$res = $xHandle->sceneHasAsset($sceneAddr, $token, $assetIds);
+var_dump($res);
+
+$opTypes = array();
+$res = $xHandle->sceneListDiffByAddr($sceneAddr, $token, 0, "", $opTypes);
+var_dump($res);
+
+$sceneAstId = 111;
+$sceneSdsId = 222;
+$res = $xHandle->sceneQueryShard($sceneAddr, $token, $sceneAstId, $sceneSdsId);
+var_dump($res);

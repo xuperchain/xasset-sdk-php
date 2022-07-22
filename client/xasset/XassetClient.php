@@ -1,6 +1,7 @@
 <?php
 require_once(XASSET_PATH . 'client/BaseClient.php');
 require_once(XASSET_PATH . "auth/BceV1Signer.php");
+require_once(XASSET_PATH . "auth/Crypto.php");
 require_once(XASSET_PATH . "utils/Utils.php");
 
 //需提前加载文件上传需要的bos sdk 否则可能会引入错误 sdk 下载地址 https://sdk.bce.baidu.com/console-sdk/bce-php-sdk-0.9.16.zip
@@ -24,11 +25,21 @@ class XassetClient extends BaseClient
     const XassetApiHoraeListAstByAddr = '/xasset/horae/v1/listastbyaddr';
     const XassetApiHoraeQueryShard = '/xasset/horae/v1/querysds';
     const XassetApiHoraeListSdsByAddr = '/xasset/horae/v1/listsdsbyaddr';
+    const XassetApiHoraeListDiffByAddr = '/xasset/horae/v1/listdiffbyaddr';
     const XassetApiHoraeListSdsByAst = '/xasset/horae/v1/listsdsbyast';
     const XassetApiHoraeAstHistory = '/xasset/horae/v1/history';
     const XassetApiHoraeGetEvidenceInfo = '/xasset/horae/v1/getevidenceinfo';
     const XassetApiHoraeFreeze = '/xasset/horae/v1/freeze';
     const XassetApiHoraeConsume = '/xasset/horae/v1/consume';
+
+    const XassetApiDidBdboxRegister = '/xasset/did/v1/bdboxregister';
+    const XassetApiDidBdboxBind = '/xasset/did/v1/bdboxbind';
+    const XassetApiDidBindByUnionid = '/xasset/did/v1/bindbyunionid';
+    const XassetApiSceneListAddr = '/xasset/scene/v1/listaddr';
+    const XassetApiSceneListSdsByAddr = '/xasset/scene/v1/listsdsbyaddr';
+    const XassetApiSceneHasAsset = '/xasset/scene/v1/hasastbyaddr';
+    const XassetApiSceneListDiffByAddr = '/xasset/scene/v1/listdiffbyaddr';
+    const XassetApiSceneQueryShard = '/xasset/scene/v1/qrysdsinfo';
 
     const XassetApiGetStoken = '/xasset/file/v1/getstoken';
 
@@ -391,9 +402,10 @@ class XassetClient extends BaseClient
      * @param string $addr
      * @param int $page
      * @param int $limit
+     * @param int $assetId
      * @return array|bool
      */
-    public function listShardsByAddr($addr, $page, $limit) {
+    public function listShardsByAddr($addr, $page, $limit, $assetId = 0) {
         $this->cleanError();
 
         if ($addr == "" || $page < 1 || $limit < 1) {
@@ -406,8 +418,43 @@ class XassetClient extends BaseClient
             'page'  => $page,
             'limit' => $limit,
         );
+        if ($assetId > 0) {
+            $body['asset_id'] = $assetId;
+        }
 
         return $this->doRequestRetry(self::XassetApiHoraeListSdsByAddr, array(), $body);
+    }
+
+    /**
+     * @content 分页拉取指定address下的藏品变更记录
+     * @param $addr
+     * @param int $limit
+     * @param string $cursor
+     * @param array $opTypes
+     * @return array|bool
+     */
+    public function listDiffByAddr($addr, $limit = 0 , $cursor = "", $opTypes = array()) {
+        $this->cleanError();
+
+        if ($addr == "") {
+            $this->setError(parent::ClientErrnoParamErr, 'param error');
+            return false;
+        }
+
+        $body = array(
+            'addr'  => $addr,
+        );
+        if ($limit > 0) {
+            $body['limit'] = $limit;
+        }
+        if ($cursor == "") {
+            $body['cursor'] = $cursor;
+        }
+        if (count($opTypes)) {
+            $body['op_types'] = json_encode($opTypes);
+        }
+
+        return $this->doRequestRetry(self::XassetApiHoraeListDiffByAddr, array(), $body);
     }
 
     /**
@@ -439,9 +486,10 @@ class XassetClient extends BaseClient
      * @param int $assetId
      * @param int $page
      * @param int $limit
+     * @param int $shardId
      * @return array|bool
      */
-    public function listAssetHistory($assetId, $page, $limit) {
+    public function listAssetHistory($assetId, $page, $limit, $shardId = 0) {
         $this->cleanError();
 
         if ($assetId < 1 || $page < 1 || $limit < 1) {
@@ -454,6 +502,9 @@ class XassetClient extends BaseClient
             'page'     => $page,
             'limit'    => $limit,
         );
+        if ($shardId > 0) {
+            $body['shard_id'] = $shardId;
+        }
 
         return $this->doRequestRetry(self::XassetApiHoraeAstHistory, array(), $body);
     }
@@ -549,5 +600,227 @@ class XassetClient extends BaseClient
         );
 
         return $this->doRequestRetry(self::XassetApiHoraeConsume, array(), $body);
+    }
+
+
+    /**
+     * @content 使用手百小程序注册链上账户
+     * @param string $openId open_id获取方式https://smartprogram.baidu.com/docs/develop/function/login_process/
+     * @param string $appKey
+     * @return array|bool
+     */
+    public function bdboxRegister($openId, $appKey) {
+        $this->cleanError();
+
+        if ($openId == "" || $appKey == "") {
+            $this->setError(parent::ClientErrnoParamErr, 'param error');
+            return false;
+        }
+
+        $encOpenId = aes_encrypt($openId, $this->credentials['sk']);
+        $encAppKey = aes_encrypt($appKey, $this->credentials['sk']);
+
+        $body = array(
+            'open_id' => $encOpenId,
+            'app_key' => $encAppKey,
+        );
+
+        $res = $this->doRequestRetry(self::XassetApiDidBdboxRegister, array(), $body);
+        if (!isset($res['response']['mnemonic'])) {
+            $this->setError(parent::ClientErrnoRespErr, 'unexpected resp');
+            return false;
+        }
+
+        $res['response']['mnemonic'] = aes_decrypt($res['response']['mnemonic'], $this->credentials['sk']);
+        return $res;
+    }
+
+    /**
+     * @content 使用手百小程序绑定链上账户 通过已有助记词进行绑定
+     * @param string $openId 手百小程序open_id
+     * @param string $appKey 手百小程序app_key
+     * @param string $mnemonic
+     * @return array|bool
+     */
+    public function bdboxBind($openId, $appKey, $mnemonic) {
+        $this->cleanError();
+
+        if ($openId == "" || $appKey == "" || $mnemonic == "") {
+            $this->setError(parent::ClientErrnoParamErr, 'param error');
+            return false;
+        }
+
+        $encOpenId = aes_encrypt($openId, $this->credentials['sk']);
+        $encAppKey = aes_encrypt($appKey, $this->credentials['sk']);
+        $encMnemonic = aes_encrypt($mnemonic, $this->credentials['sk']);
+
+        $body = array(
+            'open_id' => $encOpenId,
+            'app_key' => $encAppKey,
+            'mnemonic' => $encMnemonic,
+        );
+
+        return $this->doRequestRetry(self::XassetApiDidBdboxBind, array(), $body);
+    }
+
+    /**
+     * @content 第三方应用自动绑定链上账户
+     * @param string $unionId 获取union_id参考https://openauth.baidu.com/doc/doc.html
+     * @param string $mnemonic
+     * @return array|bool
+     */
+    public function bindByUnionid($unionId, $mnemonic) {
+        $this->cleanError();
+
+        if ($unionId == "" || $mnemonic == "") {
+            $this->setError(parent::ClientErrnoParamErr, 'param error');
+            return false;
+        }
+
+        $encUnionId = aes_encrypt($unionId, $this->credentials['sk']);
+        $encMnemonic = aes_encrypt($mnemonic, $this->credentials['sk']);
+
+        $body = array(
+            'union_id' => $encUnionId,
+            'mnemonic' => $encMnemonic,
+        );
+
+        return $this->doRequestRetry(self::XassetApiDidBindByUnionid, array(), $body);
+    }
+
+    /**
+     * @content
+     * @param string $unionId 第三方应用获取的union_id
+     * @return array|bool
+     */
+    public function sceneListAddr($unionId) {
+        $this->cleanError();
+
+        if ($unionId == "") {
+            $this->setError(parent::ClientErrnoParamErr, 'param error');
+            return false;
+        }
+
+        $encUnionId = aes_encrypt($unionId, $this->credentials['sk']);
+
+        $body = array(
+            'union_id' => $encUnionId
+        );
+
+        return $this->doRequestRetry(self::XassetApiSceneListAddr, array(), $body);
+    }
+
+    /**
+     * @content 拉取address下允许访问的藏品列表
+     * @param string $addr 要查询的账户地址
+     * @param string $token token
+     * @param int $limit
+     * @param string $cursor
+     * @return array|bool
+     */
+    public function sceneListShardsByAddr($addr, $token, $limit = 0, $cursor = "") {
+        $this->cleanError();
+
+        if ($addr == "" || $token == "") {
+            $this->setError(parent::ClientErrnoParamErr, 'param error');
+            return false;
+        }
+
+        $body = array(
+            'addr' => $addr,
+            'token' => $token,
+        );
+        if ($limit > 0) {
+            $body['limit'] = $limit;
+        }
+        if ($cursor != "") {
+            $body['cursor'] = $cursor;
+        }
+
+        return $this->doRequestRetry(self::XassetApiSceneListSdsByAddr, array(), $body);
+    }
+
+    /**
+     * @content 判断address下是否有指定藏品
+     * @param string $addr 账户地址
+     * @param string $token token
+     * @param array $assetIds asset_id列表一次查询不超过10个
+     * @return array|bool
+     */
+    public function sceneHasAsset($addr, $token, $assetIds) {
+        $this->cleanError();
+
+        if ($addr == "" || $token == "" || count($assetIds) < 1) {
+            $this->setError(parent::ClientErrnoParamErr, 'param error');
+            return false;
+        }
+
+        $body = array(
+            'addr' => $addr,
+            'token' => $token,
+            'asset_ids' => json_encode($assetIds),
+        );
+
+        return $this->doRequestRetry(self::XassetApiSceneHasAsset, array(), $body);
+    }
+
+    /**
+     * @content 拉取address下藏品变更记录
+     * @param string $addr
+     * @param string $token
+     * @param int $limit
+     * @param string $cursor
+     * @param array $opTypes 操作类型
+     * @return array|bool
+     */
+    public function sceneListDiffByAddr($addr, $token, $limit = 0, $cursor = "", $opTypes = array()) {
+        $this->cleanError();
+
+        if ($addr == "" || $token == "") {
+            $this->setError(parent::ClientErrnoParamErr, 'param error');
+            return false;
+        }
+
+        $body = array(
+            'addr' => $addr,
+            'token' => $token,
+        );
+        if ($limit > 0) {
+            $body['limit'] = $limit;
+        }
+        if ($cursor != "") {
+            $body['cursor'] = $cursor;
+        }
+        if (count($opTypes) > 0) {
+            $body['op_types'] = json_encode($opTypes);
+        }
+
+        return $this->doRequestRetry(self::XassetApiSceneListDiffByAddr, array(), $body);
+    }
+
+    /**
+     * @content 查询用户碎片详情
+     * @param string $addr
+     * @param string $token
+     * @param int $assetId
+     * @param int $shardId
+     * @return array|bool
+     */
+    public function sceneQueryShard($addr, $token, $assetId, $shardId) {
+        $this->cleanError();
+
+        if ($addr == "" || $token == "" || $assetId < 1 || $shardId < 1) {
+            $this->setError(parent::ClientErrnoParamErr, 'param error');
+            return false;
+        }
+
+        $body = array(
+            'addr' => $addr,
+            'token' => $token,
+            'asset_id' => $assetId,
+            'shard_id' => $shardId,
+        );
+
+        return $this->doRequestRetry(self::XassetApiSceneQueryShard, array(), $body);
     }
 }
