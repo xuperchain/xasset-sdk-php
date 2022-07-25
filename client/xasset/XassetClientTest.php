@@ -58,6 +58,9 @@ $res = $xHandle->createAsset($account, $assetId, 10000, $strAssetInfo, $price, $
 var_dump($res);
 
 
+$res = $xHandle->uploadFile($account,'draw_star.jpeg',"./uploads/draw_star.jpeg"  );
+var_dump($res);
+
 $arrAssetInfo = array(
     'title' => '收藏品1号',
     'asset_cate' => 2,
@@ -84,6 +87,12 @@ var_dump($res);
 
 //上链需要一点时间
 sleep(5);
+
+$res = $xHandle->ConsumeShard($account, $account1, $assetId, $shardId);
+var_dump($res);
+
+$res = $xHandle->FreezeAsset($account, $assetId);
+var_dump($res);
 
 $res = $xHandle->horaeListbystatus($account, 0, 1, 20);
 var_dump($res);
